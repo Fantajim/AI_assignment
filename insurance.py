@@ -42,10 +42,10 @@ test_data = df.drop(train_data.index)
 #print(train_data.describe().transpose())
 
 ## Prepare training/label data
-train_features = train_data.copy()
-test_features = test_data.copy()
-
+train_features = train_data.copy().astype("float32")
 train_labels = train_features.pop("class")
+
+test_features = test_data.copy().astype("float32")
 test_labels = test_features.pop("class")
 
 #normalizer = preprocessing.Normalization(input_shape=[9, ])
@@ -56,10 +56,10 @@ model = keras.Sequential([
     keras.layers.Dense(18, activation="relu", input_shape=[9]),
     keras.layers.Dense(36, activation="relu"),
     keras.layers.Dense(18, activation="relu"),
-    keras.layers.Dense(1)
+    keras.layers.Dense(3, activation="softmax")
 ])
-#optimizer = keras.optimizers.Adam()
-optimizer = keras.optimizers.RMSprop(0.0099)
-model.compile(loss="mean_squared_error", optimizer=optimizer, metrics="accuracy")
+optimizer = keras.optimizers.Adam()
+#optimizer = keras.optimizers.RMSprop(0.0099)
+model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics="accuracy")
 model.fit(x=train_features, y=train_labels, batch_size=16, epochs=1000,
-          validation_data=(test_features, test_labels), shuffle=True)
+          validation_split=0.2, shuffle=True)
